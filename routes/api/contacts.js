@@ -16,7 +16,7 @@ router.get("/", async (req, res, next) => {
   try {
     const contacts = await listContacts();
     res.status(200).json({ message: "Success!", contacts });
-    console.log("getUsers:", contacts);
+    
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error fetching contacts" });
@@ -26,7 +26,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const contactId = req.params.id;
-    console.log("Id:", contactId);
+    
     const contact = await getContactById(contactId);
 
     if (!contact) {

@@ -2,15 +2,13 @@ const fs = require("fs").promises;
 const path = require("path");
 
 const contactsPath = path.resolve("models/contacts.json");
-// console.log("contactsPath:", contactsPath);
 
 const listContacts = async () => {
   try {
-    // Повертає масив контактів.
     const readResult = await fs.readFile(contactsPath);
-    // console.log("readResult:", readResult);
+    
     const arrayContacts = JSON.parse(readResult);
-    // console.log("listContacts:", arrayContacts);
+  
     return arrayContacts;
   } catch (err) {
     console.error("Error reading contacts file:", err);
@@ -21,11 +19,11 @@ const listContacts = async () => {
 const getContactById = async (contactId) => {
   try {
     const contacts = await listContacts();
-    // console.log("contacts:", contacts);
+    
     const foundContactById = contacts.find(
       (contact) => contact.id === contactId
     );
-    // console.log("getContactById:", foundContactById);
+ 
     return foundContactById;
   } catch (err) {
     console.error("Error getting contact by ID:", err);
@@ -36,17 +34,17 @@ const getContactById = async (contactId) => {
 const removeContact = async (contactId) => {
   try {
     const contacts = await listContacts();
-    // console.log("contacts:", contacts);
+
     const findContactIndex = contacts.findIndex(
       (contact) => contact.id === contactId
     );
 
     if (findContactIndex < 0) {
-      // console.error("message:", "Not found");
+    
       return null;
     } else {
       const removeContactById = contacts.splice(findContactIndex, 1)[0];
-      // console.log("removeContactById:", removeContactById);
+     
       return removeContactById;
     }
   } catch (err) {
@@ -61,7 +59,7 @@ const addContact = async (body) => {
 
     contacts.push(body);
     await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-    console.log("Added contact:", body);
+  
     return contacts;
   } catch (err) {
     console.error("Error adding contact:", err);
