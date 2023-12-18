@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
 const contactsRouter = require("./routes/api/contacts");
+const favoriteRouter = require("./routes/api/contacts");
 const morgan = require("morgan");
 
 dotenv.config({
@@ -34,6 +35,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
+app.use("/api/contacts", favoriteRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
