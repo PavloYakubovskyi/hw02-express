@@ -6,9 +6,11 @@ const {
   removeContact,
   addContact,
   updateContact,
+  updateStatusContact,
 } = require("../../models/contacts");
 
 const { HttpError, contactsValidators } = require("../../utils");
+const { Contact } = require("../../models");
 
 const router = express.Router();
 
@@ -16,7 +18,6 @@ router.get("/", async (req, res, next) => {
   try {
     const contacts = await listContacts();
     res.status(200).json({ message: "Success!", contacts });
-    
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Error fetching contacts" });
@@ -26,7 +27,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const contactId = req.params.id;
-    
+
     const contact = await getContactById(contactId);
 
     if (!contact) {
@@ -47,21 +48,16 @@ router.post("/", async (req, res, next) => {
     if (validationResult.error) {
       throw new HttpError(400, "Invalid contacts data!");
     }
-
     const { name, email, phone } = validationResult.value;
-
     if (!name || !email || !phone) {
       return res.status(400).json({ message: "missing required name field" });
     }
-    const id = Date.now().toString();
-    const newContact = {
-      id,
-      name,
-      email,
-      phone,
-    };
-    await addContact(newContact);
-    res.status(201).json(newContact);
+
+    const newContact = await Contact.create(req.body);
+    res.status(201).json({
+      msg: "Success!",
+      contact: newContact,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error adding contact" });
@@ -107,6 +103,31 @@ router.put("/:contactId", async (req, res, next) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error updating contact" });
+  }
+});
+
+router.patch("/:contactId/favorite", async (req, res, next) => {
+  const contactId = req.params.contactId;
+  const { favorite } = req.body;
+
+  if (favorite === undefined) {
+    return res.status(400).json({ message: "missing field favorite" });
+  }
+
+  if (typeof favorite !== "boolean") {
+    return res.status(400).json({ message: "favorite must be a boolean" });
+  }
+
+  try {
+    const updateContact = await updateStatusContact(contactId, favorite);
+
+    if (!updateContact) {
+      return res.status(404).json({ message: "Not found" });
+    }
+    res.status(200).json(updateContact);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

@@ -2,7 +2,7 @@ const Joi = require("joi");
 
 exports.createContactsValidator = (data) =>
   Joi.object({
-    name: Joi.string().min(3).required(),
+    name: Joi.string().min(3).max(30).required(),
     email: Joi.string().email().required(),
     phone: Joi.string().required(),
   }).validate(data);
