@@ -4,7 +4,6 @@ const {
   listContacts,
   getContactById,
   removeContact,
-  // addContact,
   updateContact,
   updateStatusContact,
 } = require("../../models/contacts");

@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 const contactsRouter = require("./routes/api/contacts");
 const favoriteRouter = require("./routes/api/contacts");
+const usersRouter = require("./routes/api/usersRouter");
 
 const morgan = require("morgan");
 
@@ -37,6 +38,7 @@ app.use(express.json());
 
 app.use("/api/contacts", contactsRouter);
 app.use("/api/contacts", favoriteRouter);
+app.use("/users", usersRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
