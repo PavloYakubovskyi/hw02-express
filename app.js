@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 const contactsRouter = require("./routes/api/contacts");
 const favoriteRouter = require("./routes/api/contacts");
+
 const morgan = require("morgan");
 
 dotenv.config({
@@ -18,7 +19,7 @@ dotenv.config({
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
-// if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
+if (process.env.NODE_ENV === "development") app.use(morgan("dev"));
 
 mongoose
   .connect(process.env.MONGO_URL)

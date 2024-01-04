@@ -4,7 +4,7 @@ const {
   listContacts,
   getContactById,
   removeContact,
-  addContact,
+  // addContact,
   updateContact,
   updateStatusContact,
 } = require("../../models/contacts");
@@ -50,29 +50,38 @@ router.post("/", async (req, res, next) => {
     }
     const { name, email, phone } = validationResult.value;
     if (!name || !email || !phone) {
-      return res.status(400).json({ message: "missing required name field" });
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+    const existingContact = await Contact.findOne({ email });
+
+    if (existingContact) {
+      return res
+        .status(400)
+        .json({ message: "Contact with this email already exists" });
     }
 
     const newContact = await Contact.create(req.body);
     res.status(201).json({
-      msg: "Success!",
+      msg: "Contact added successfully",
       contact: newContact,
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Error adding contact" });
+    res
+      .status(err.statusCode || 500)
+      .json({ message: err.message || "Error adding contact" });
   }
 });
 
 router.delete("/:contactId", async (req, res, next) => {
   try {
     const contactId = req.params.contactId;
-    const deleteUser = await removeContact(contactId);
+    const deletedContact = await removeContact(contactId);
 
-    if (!deleteUser) {
+    if (!deletedContact) {
       return res.status(404).json({ message: "Not found" });
     }
-    res.status(200).json({ message: "Contact deleted" });
+    res.status(200).json({ message: "Contact deleted", deletedContact });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error deleting contact" });
@@ -82,24 +91,24 @@ router.delete("/:contactId", async (req, res, next) => {
 router.put("/:contactId", async (req, res, next) => {
   try {
     const contactId = req.params.contactId;
-    const validationResult = contactsValidators.updateContactsValidator(
+    const { value, error } = contactsValidators.updateContactsValidator(
       req.body
     );
-    const body = validationResult.value;
-    if (validationResult.error) {
-      return res.status(400).json({ message: "Validation error" });
+
+    if (error) {
+      return res.status(400).json({ message: "Validation error", error });
     }
 
-    if (!body || Object.keys(body).length === 0) {
+    if (!value || Object.keys(value).length === 0) {
       return res.status(400).json({ message: "Missing fields" });
     }
 
-    const updateContacts = await updateContact(contactId, body);
+    const updatedContact = await updateContact(contactId, value);
 
-    if (!updateContact) {
+    if (!updatedContact) {
       return res.status(404).json({ message: "Not found" });
     }
-    res.status(200).json(updateContacts);
+    res.status(200).json(updatedContact);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error updating contact" });
