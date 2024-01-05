@@ -1,9 +1,9 @@
 const HttpError = require("./httpError");
 const contactsValidators = require("./contactsValidators");
-const registrationValidators = require("./registrationValidators");
+const usersValidators = require("./usersValidators");
 
 module.exports = {
   HttpError,
   contactsValidators,
-  registrationValidators,
+  usersValidators,
 };
