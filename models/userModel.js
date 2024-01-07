@@ -1,4 +1,8 @@
-const { model, Schema } = require("mongoose");
+const { Schema, model } = require("mongoose");
+const { handleMongooseError } = require("../helpers");
+const Joi = require("joi");
+
+const emailRegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
 const userSchema = new Schema({
   password: {
@@ -18,6 +22,37 @@ const userSchema = new Schema({
   token: String,
 });
 
-const User = model("User", userSchema);
+userSchema.post("save", handleMongooseError);
 
-module.exports = User;
+const registerSchema = Joi.object({
+  email: Joi.string()
+    .email()
+    .required()
+    .pattern(emailRegExp)
+    .message({ "any.required": "Missing required email field." }),
+  password: Joi.string()
+    .min(6)
+    .required()
+    .messages({ "any.required": "Missing required password field." }),
+});
+
+const loginSchema = Joi.object({
+  email: Joi.string()
+    .email()
+    .required()
+    .pattern(emailRegExp)
+    .message({ "any.required": "Missing required email field." }),
+  password: Joi.string()
+    .min(6)
+    .required()
+    .messages({ "any.required": "Missing required password field." }),
+});
+
+const schemas = {
+  registerSchema,
+  loginSchema,
+};
+
+const User = model("user", userSchema);
+
+module.exports = { User, schemas };
