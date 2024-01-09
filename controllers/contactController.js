@@ -5,7 +5,16 @@ const getAllContacts = async (req, res) => {
   const { _id: owner } = req.user;
   const { page = 1, limit = 20, favorite } = req.query;
   const skip = (page - 1) * limit;
-  const allContacts = await Contact.find({ owner }, "", { skip, limit });
+
+  const query = { owner };
+  if (favorite !== undefined) {
+    query.favorite = favorite;
+  }
+
+  const allContacts = await Contact.find({ query }, "", {
+    skip,
+    limit,
+  });
 
   let favoriteContacts;
   if (favorite === "true") {
@@ -46,6 +55,13 @@ const removeContactById = async (req, res) => {
 
 const updateContactById = async (req, res) => {
   const { contactId } = req.params;
+
+  const { _id: currentUserId } = req.user;
+  const contact = await Contact.findById(contactId);
+  if (!contact || contact.owner?.toString() !== currentUserId) {
+    throw httpError(403, "Forbidden");
+  }
+
   const updatedContact = await Contact.findByIdAndUpdate(contactId, req.body, {
     new: true,
   });
