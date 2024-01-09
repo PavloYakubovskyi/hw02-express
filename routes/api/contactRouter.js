@@ -5,19 +5,24 @@ const { schemas } = require("../../models/contactModel");
 
 const router = express.Router();
 
-router.get("/", authorization, ctrl.getAllContacts);
+router.get("/contacts", authorization, ctrl.getAllContacts);
 
-router.get("/:contactId", authorization, isValidId, ctrl.getContactById);
+router.get(
+  "/contacts/:contactId",
+  authorization,
+  isValidId,
+  ctrl.getContactById
+);
 
 router.post(
-  "/",
+  "/contacts",
   authorization,
   validateBody(schemas.addSchema),
   ctrl.addContact
 );
 
 router.put(
-  "/:contactId",
+  "/contacts/:contactId",
   authorization,
   isValidId,
   validateBody(schemas.addSchema),
@@ -25,13 +30,18 @@ router.put(
 );
 
 router.patch(
-  "/:contactId/favorite",
+  "/contacts/:contactId/favorite",
   authorization,
   isValidId,
   validateBody(schemas.updateFavoriteSchema),
   ctrl.updateStatusContact
 );
 
-router.delete("/:contactId", authorization, isValidId, ctrl.removeContactById);
+router.delete(
+  "/contacts/:contactId",
+  authorization,
+  isValidId,
+  ctrl.removeContactById
+);
 
 module.exports = router;
