@@ -1,10 +1,14 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const path = require("path");
+const gravatar = require("gravatar");
 require("dotenv").config();
 
 const { httpError, ctrlWrapper } = require("../helpers");
 const { User } = require("../models/userModel");
 const { JWT_SECRET_KEY, JWT_EXPIRES } = process.env;
+
+const publicPath = path.join(__dirname, "../", "public");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -18,15 +22,19 @@ const register = async (req, res) => {
   const saltRounds = 10;
   const hashPassword = await bcrypt.hash(password, saltRounds);
 
+  const avatarURL = gravatar.url(email, { s: "150", r: "pg", d: "identicon" });
+
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
+    avatarURL,
   });
 
   res.status(201).json({
     user: {
       email: newUser.email,
       subscription: newUser.subscription,
+      avatarURL,
     },
   });
 };
@@ -84,4 +92,5 @@ module.exports = {
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   getCurrent: ctrlWrapper(getCurrent),
+  publicPath,
 };
