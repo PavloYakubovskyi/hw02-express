@@ -3,6 +3,7 @@ const { handleMongooseError } = require("../helpers");
 const Joi = require("joi");
 
 const emailRegExp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const passwordRegexp = /^[A-Za-z]\w{7,14}$/;
 
 const userSchema = new Schema({
   password: {
@@ -49,9 +50,26 @@ const loginSchema = Joi.object({
     .messages({ "any.required": "Missing required password field." }),
 });
 
+const emailSchema = Joi.object({
+  email: Joi.string().pattern(emailRegExp).required(),
+});
+
+const validateSchema = Joi.object({
+  email: Joi.string().pattern(emailRegExp).required(),
+  password: Joi.string().pattern(passwordRegexp).required(),
+  subscription: Joi.string(),
+});
+
+const validateSubscription = Joi.object({
+  subscription: Joi.string().valid("starter", "pro", "business").required(),
+});
+
 const schemas = {
   registerSchema,
   loginSchema,
+  emailSchema,
+  validateSchema,
+  validateSubscription,
 };
 
 const User = model("user", userSchema);
